@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ScrapperModule } from './scrapper/scrapper.module';
+import { ConfigModule } from '@nestjs/config';
 import { TelegrafModule } from 'nestjs-telegraf';
+
+import { AppService } from './app.service';
+import { AppController } from './app.controller';
+import { ScrapperModule } from './scrapper/scrapper.module';
 import { CulturalEventsTelegramBotModule } from './bot/cultural-events-telegram-bot.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [

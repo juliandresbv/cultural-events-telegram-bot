@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
+
+import { ScrapperModule } from '../scrapper/scrapper.module';
 import { CulturalEventsTelegramBotService } from './cultural-events-telegram-bot.service';
-import { ScrapperModule } from 'src/scrapper/scrapper.module';
 
 @Module({
   imports: [ScrapperModule],

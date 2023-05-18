@@ -1,8 +1,3 @@
-import {
-  normalizeText,
-  normalizeWhiteSpaces,
-  capitalizeFirstLetter,
-} from 'normalize-text';
 import * as cheerio from 'cheerio';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
@@ -12,9 +7,9 @@ import { createArrayFromRange } from '../../../scrapper/utils/utils';
 import { CulturalEvent } from '../../../scrapper/types/scrapper.type';
 
 @Injectable()
-export class ProImagenesColombiaProvider {
-  private readonly baseUrl = process?.env?.PRO_IMAGENES_COLOMBIA_BASE_URL;
-  private readonly elementsPerPage = 8;
+export class AgendaCulturalBogotaProvider {
+  private readonly baseUrl = process?.env?.AGENDA_CULTURAL_BOGOTA_BASE_URL;
+  private readonly elementsPerPage = 6;
 
   constructor(private readonly httpService: HttpService) {}
 
@@ -29,14 +24,15 @@ export class ProImagenesColombiaProvider {
   public async getData(eventsQuantity?: number): Promise<string[]> {
     try {
       const lastPage = Math.ceil(eventsQuantity / this.elementsPerPage);
-      const pages = createArrayFromRange(1, lastPage);
+      const pages = createArrayFromRange(0, lastPage - 1);
 
       const eventsData = (
         await Promise.allSettled(
           pages.map((page) =>
             firstValueFrom(
               this.httpService.get(
-                `${this.baseUrl}/secciones/eventos/eventos.php?tipo=1&pagina=${page}`,
+                `${this.baseUrl}/que-hacer/agenda-cultural?page=${page}`,
+                { timeout: 5000 },
               ),
             ),
           ),
@@ -57,22 +53,42 @@ export class ProImagenesColombiaProvider {
 
   public formatData(data: string): CulturalEvent[] {
     const document = cheerio.load(data);
-    const eventElements = document('div.listCif').children().toArray();
+    const eventElements = document(
+      '#main > div > div.region.region-content > div.vista_agenda-cultural-eventos > div.after-banner > div > div > div:nth-child(3) > div > div.view-content',
+    )
+      .children()
+      .toArray();
 
-    const eventsToJson = eventElements.map((event) => {
-      const title = document(event).find('.gDesc > h3')?.text();
-      const rawDescription = document(event).find('.gDesc > .desc')?.text();
-      const description = capitalizeFirstLetter(
-        normalizeWhiteSpaces(normalizeText(rawDescription)),
-      );
-      const date = document(event).find('.gDesc > h4')?.text();
+    const eventsToJson = eventElements.map((event, index) => {
+      const title = document(event)
+        .find(
+          `div:nth-child(${
+            index + 1
+          }) > div > div > div > div:nth-child(2) > div > div:nth-child(1) > h2 > a`,
+        )
+        ?.text();
+      const date = [1, 2, 3, 4].reduce((acc, curr) => {
+        const partialDate = document(event)
+          .find(
+            `div:nth-child(${
+              index + 1
+            }) > div > div > div > div:nth-child(2) > div > div:nth-child(3) > div > div.col-xs-4.right-separator > p > span:nth-child(${curr})`,
+          )
+          ?.text();
+
+        return `${acc} ${partialDate}`?.trim();
+      }, '');
       const link = `${this.baseUrl}${document(event)
-        .find('.gDesc > a')
+        .find(
+          `div:nth-child(${
+            index + 1
+          }) > div > div > div > div:nth-child(2) > div > div:nth-child(1) > h2 > a`,
+        )
         ?.attr('href')}`;
 
       return {
         title,
-        description,
+        description: null,
         date,
         link,
       };
