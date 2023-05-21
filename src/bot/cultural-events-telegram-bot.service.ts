@@ -21,7 +21,11 @@ export class CulturalEventsTelegramBotService {
   async start(@Ctx() ctx: Context) {
     console.log('start command received');
 
-    await ctx.reply('Bienvenido al bot de Eventos Culturales');
+    const greetingMsg = '¡Hola!, soy el bot de Eventos Culturales.\n\n';
+    const goToHelpCommandMsg =
+      'Para ver todas mis funciones, escribe el comando /help\n';
+
+    await ctx.reply(greetingMsg + goToHelpCommandMsg);
   }
 
   @Help()
@@ -31,15 +35,15 @@ export class CulturalEventsTelegramBotService {
     const headerHelpMsg =
       'A continuación se muestran los comandos disponibles:\n\n';
 
-    const headerStartHelpMsg = '/start\n\n';
+    const headerStartHelpMsg = '/start\n';
     const bodyStartHelpMsg1 = `Inicia el chat con el chatbot.\n\n`;
     const fullStartHelpMsg = headerStartHelpMsg + bodyStartHelpMsg1;
 
-    const headerHelpHelpMsg = '/help\n\n';
+    const headerHelpHelpMsg = '/help\n';
     const bodyHelpHelpMsg1 = `Brinda ayuda de cómo usar este chatbot.\n\n`;
     const fullHelpHelpMsg = headerHelpHelpMsg + bodyHelpHelpMsg1;
 
-    const headerEventsHelpMsg = '/eventos [cat:categoria] [n:número]\n\n';
+    const headerEventsHelpMsg = '/eventos [cat:categoria] [n:número]\n';
     const bodyEventsHelpMsg1 = `Muestra los eventos de la categoría indicada.\n`;
     const bodyEventsHelpMsg2 = `Parámetros:\n- cat: categoría comprendida en las siguientes categorías (${this.categories.join(
       ', ',

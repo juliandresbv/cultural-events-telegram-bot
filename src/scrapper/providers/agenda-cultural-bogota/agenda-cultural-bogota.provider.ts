@@ -2,6 +2,7 @@ import * as cheerio from 'cheerio';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
+import * as https from 'https';
 
 import { createArrayFromRange } from '../../../scrapper/utils/utils';
 import { CulturalEvent } from '../../../scrapper/types/scrapper.type';
@@ -32,22 +33,27 @@ export class AgendaCulturalBogotaProvider {
             firstValueFrom(
               this.httpService.get(
                 `${this.baseUrl}/que-hacer/agenda-cultural?page=${page}`,
-                { timeout: 5000 },
+                {
+                  timeout: 5000,
+                  httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+                },
               ),
             ),
           ),
         )
-      )
-        ?.filter((event) => event?.status === 'fulfilled')
-        ?.map(
-          (event) => (event as PromiseFulfilledResult<any>)?.value?.data,
-        ) as string[];
+      )?.map((event) => {
+        if (event?.status == 'rejected') {
+          throw event?.reason;
+        }
+
+        return (event as PromiseFulfilledResult<any>)?.value?.data;
+      });
 
       return eventsData;
     } catch (error) {
       console.log(`[ERROR] error getting data from ${this.baseUrl}`, error);
 
-      throw error;
+      // throw error;
     }
   }
 

@@ -41,17 +41,19 @@ export class ProImagenesColombiaProvider {
             ),
           ),
         )
-      )
-        ?.filter((event) => event?.status === 'fulfilled')
-        ?.map(
-          (event) => (event as PromiseFulfilledResult<any>)?.value?.data,
-        ) as string[];
+      )?.map((event) => {
+        if (event?.status == 'rejected') {
+          throw event?.reason;
+        }
+
+        return (event as PromiseFulfilledResult<any>)?.value?.data;
+      });
 
       return eventsData;
     } catch (error) {
       console.log(`[ERROR] error getting data from ${this.baseUrl}`, error);
 
-      throw error;
+      // throw error;
     }
   }
 
