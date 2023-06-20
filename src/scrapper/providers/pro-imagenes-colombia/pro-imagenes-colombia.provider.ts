@@ -3,6 +3,7 @@ import {
   normalizeWhiteSpaces,
   capitalizeFirstLetter,
 } from 'normalize-text';
+import * as https from 'https';
 import * as cheerio from 'cheerio';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
@@ -37,6 +38,10 @@ export class ProImagenesColombiaProvider {
             firstValueFrom(
               this.httpService.get(
                 `${this.baseUrl}/secciones/eventos/eventos.php?tipo=1&pagina=${page}`,
+                {
+                  timeout: 5000,
+                  httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+                },
               ),
             ),
           ),

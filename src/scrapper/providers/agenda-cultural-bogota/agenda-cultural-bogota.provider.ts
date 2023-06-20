@@ -1,8 +1,8 @@
+import * as https from 'https';
 import * as cheerio from 'cheerio';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
-import * as https from 'https';
 
 import { createArrayFromRange } from '../../../scrapper/utils/utils';
 import { CulturalEvent } from '../../../scrapper/types/scrapper.type';
